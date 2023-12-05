@@ -1,4 +1,5 @@
-import * as React from 'react';
+//import * as React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +13,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import {auth} from '../../services/firebase';
 
 function Copyright(props) {
   return (
@@ -26,18 +29,38 @@ function Copyright(props) {
   );
 }
 
+
+
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    // Now you can use 'email' and 'password' in your login logic
+    console.log('Email:', email);
+    console.log('Password:', password);
+    // Add your login logic here
+      signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+              console.log(userCredential);
+          })
+          .catch((error) => {
+              console.log('error');
+          })
   };
 
   return (
@@ -66,6 +89,8 @@ export default function SignIn() {
               id="email"
               label="Email Address"
               name="email"
+              value={email}
+              onChange={handleEmailChange}
               autoComplete="email"
               autoFocus
             />
@@ -77,6 +102,8 @@ export default function SignIn() {
               label="Password"
               type="password"
               id="password"
+              value={password}
+              onChange={handlePasswordChange}
               autoComplete="current-password"
             />
             <FormControlLabel
