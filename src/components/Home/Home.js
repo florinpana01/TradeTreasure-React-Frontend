@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
+import React, { useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -14,75 +13,108 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import './Home.css';
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
+const ExpandMore = (props) => {
+  //const { expand, onClick } = props;
+  const { onClick } = props;
+  return <IconButton onClick={onClick} />;
+};
 
-export default function Home() {
-  const [expanded, setExpanded] = React.useState(false);
+const Home = () => {
+  const [products, setProducts] = useState([]);
+  const [expanded, setExpanded] = useState({});
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:8001/api/products/timeline');
+        const data = await response.json();
+        setProducts(data);
+        // Initialize expanded state for each product
+        const initialExpandedState = {};
+        data.forEach((product) => {
+          initialExpandedState[product.id] = false;
+        });
+        setExpanded(initialExpandedState);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleExpandClick = (productId) => {
+    setExpanded((prevExpanded) => ({
+      ...prevExpanded,
+      [productId]: !prevExpanded[productId],
+    }));
   };
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardHeader
-        avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
-          </Avatar>
-        }
-        action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        }
-        title="PRoduct title"
-        subheader="September 14, 2016"
-      />
-      <CardMedia
-        component="img"
-        height="194"
-        image="https://cdn.shopify.com/s/files/1/1998/6151/articles/New_product_stamp_2048x.progressive.jpg?v=1495200643"
-        alt="Product card example"
-      />
-      <CardContent>
-        <Typography variant="body2" color="text.secondary">
-          The first # characters of the description
-        </Typography>
-      </CardContent>
-      <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton>
-        <ExpandMore
-          expand={expanded}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </ExpandMore>
-      </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          <Typography paragraph>
-            The entire description
-          </Typography>
-        </CardContent>
-      </Collapse>
-    </Card>
+    <div>
+      <h1>*User*'s timeline</h1>
+    <div>
+      {products.map((product) => (
+        <Card key={product.id} sx={{ maxWidth: 345 }} className="card">
+          <CardHeader
+            avatar={
+              <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                R
+              </Avatar>
+            }
+            action={
+              <IconButton aria-label="settings">
+                <MoreVertIcon />
+              </IconButton>
+            }
+            title={product.title}
+            subheader={product.date}
+          />
+          <CardMedia
+            component="img"
+            height="194"
+            image={product.image}
+            alt="Image"
+          />
+          <CardContent>
+          <Typography variant="body2" color="text.secondary">
+              Category: {product.category}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Price: {product.price}$
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {product.likes} likes
+            </Typography>
+          </CardContent>
+          <CardActions disableSpacing>
+            <IconButton aria-label="add to favorites">
+              <FavoriteIcon />
+            </IconButton>
+            <IconButton aria-label="share">
+              <ShareIcon />
+            </IconButton>
+            <ExpandMore
+              expand={expanded[product.id]}
+              onClick={() => handleExpandClick(product.id)}
+              aria-expanded={expanded[product.id]}
+              aria-label="show more"
+            >
+              <ExpandMoreIcon />
+            </ExpandMore>
+          </CardActions>
+          <Collapse in={expanded[product.id]} timeout="auto" unmountOnExit>
+            <CardContent>
+              <Typography paragraph>{product.price}</Typography>
+            </CardContent>
+          </Collapse>
+        </Card>
+      ))}
+    </div>
+    </div>
   );
-}
+};
+
+export default Home;

@@ -5,7 +5,11 @@ import './Navbar.css';
 const Navbar = () => {
   return (
     <nav>
-      <h1>Logo</h1>
+            <img
+        src={process.env.PUBLIC_URL + '/ttlogo.png'} // Replace with the actual path to your image
+        alt="Logo"
+        className="logo"
+      />
       <div>
         <Link to="/">Home</Link>
         <Link to="/profile">Profile</Link>

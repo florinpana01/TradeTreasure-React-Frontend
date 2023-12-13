@@ -24,6 +24,7 @@ function Product() {
         <div key={product.id} className="product">
           <h3>{product.title}</h3>
           <p>Description: {product.description}</p>
+          <p>Category: {product.category}</p>
           {/* <p>Price: ${product.price.toFixed(2)}</p> */}
           {/* Add more product information here */}
         </div>
