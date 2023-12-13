@@ -13,35 +13,46 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme();
-
-export default function SignUp() {
-  const handleSubmit = (event) => {
+function SignUp() {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const formData = new FormData(event.currentTarget);
+
+    try {
+      const response = await fetch('http://localhost:8001/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Include any additional headers if required
+        },
+        body: JSON.stringify({
+          firstName: formData.get('firstName'),
+          lastName: formData.get('lastName'),
+          email: formData.get('email'),
+          password: formData.get('password'),
+          allowExtraEmails: formData.get('allowExtraEmails') === 'on', // Convert checkbox value to boolean
+        }),
+      });
+
+      if (response.ok) {
+        // User created successfully
+        console.log('User created successfully');
+        // Perform any additional actions, such as showing a success message or redirecting
+      } else {
+        // Handle errors
+        console.error('Failed to create user');
+        // Perform any additional error handling, such as showing an error message
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
   };
 
+  const theme = createTheme();
+
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -104,7 +115,7 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
+                  control={<Checkbox name="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>
@@ -126,8 +137,9 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
 }
+
+export default SignUp;
