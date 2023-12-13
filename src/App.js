@@ -8,6 +8,7 @@ import Product from './components/Product/Product';
 import Profile from './components/Profile/Profile';
 import SignIn from './components/SignIn/SignIn';
 import SignUp from './components/SignUp/SignUp';
+import CreateProduct from './components/CreateProduct/CreateProduct';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/product" component={Product} />
           <Route path="/signin" component={SignIn} />
           <Route path="/signup" component={SignUp} />
+          <Route path="/create" component={CreateProduct} />
           {/* Add more routes as needed */}
         </Switch>
       </div>

@@ -55,6 +55,7 @@ const Home = () => {
   return (
     <div>
       <h1>*User*'s timeline</h1>
+      <a href='/create'>Sell your product</a>
     <div>
       {products.map((product) => (
         <Card key={product.id} sx={{ maxWidth: 345 }} className="card">
