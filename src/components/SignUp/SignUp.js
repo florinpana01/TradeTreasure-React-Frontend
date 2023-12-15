@@ -1,4 +1,5 @@
-import * as React from 'react';
+// src/Components/SignUp/SignUp.js
+import React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,26 +13,39 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+// import { auth } from '../../firebase';
+
+// Import createUserWithEmailAndPassword from firebase/auth
+//import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 function SignUp() {
+  //const [email, setEmail] = useState('');
+  //const [password, setPassword] = useState('');
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     const formData = new FormData(event.currentTarget);
+    const userData = {
+      firstName: formData.get('firstName'),
+      lastName: formData.get('lastName'),
+      email: formData.get('email'),
+      password: formData.get('password'),
+      allowExtraEmails: formData.get('allowExtraEmails') === 'on',
+    };
 
     try {
+      // Create user in Firebase
+      //const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
+      //const user = userCredential.user;
+
+      // If successful, proceed with your existing user registration logic
       const response = await fetch('http://localhost:8001/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Include any additional headers if required
         },
-        body: JSON.stringify({
-          firstName: formData.get('firstName'),
-          lastName: formData.get('lastName'),
-          email: formData.get('email'),
-          password: formData.get('password'),
-          allowExtraEmails: formData.get('allowExtraEmails') === 'on', // Convert checkbox value to boolean
-        }),
+        body: JSON.stringify(userData),
       });
 
       if (response.ok) {

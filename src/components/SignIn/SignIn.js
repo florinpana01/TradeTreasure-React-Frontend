@@ -1,4 +1,4 @@
-//import * as React from 'react';
+// Import necessary dependencies
 import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -14,55 +14,72 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import {auth} from '../../services/firebase';
+import { auth } from '../../firebase';
+import { useHistory } from 'react-router-dom'; // Import useHistory
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+// Function to validate email format
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
-
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
+// Create a default theme
 const defaultTheme = createTheme();
 
+// SignIn component
 export default function SignIn() {
-
+  // State to store email and password
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  // Access the history object
+  const history = useHistory();
+
+  // Event handler for email change
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
 
+  // Event handler for password change
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  // Event handler for form submission
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Now you can use 'email' and 'password' in your login logic
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Add your login logic here
-      signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-              console.log(userCredential);
-          })
-          .catch((error) => {
-              console.log('error');
-          })
+
+    // Validate email format
+    if (!isValidEmail(email)) {
+      setError('Invalid email format');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Handle successful login
+      console.log('User authenticated successfully', user);
+
+      // Redirect to the profile page
+      history.push('/profile');
+
+    } catch (error) {
+      setError('Invalid credentials');
+      console.error('Error signing in:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Render the component
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -82,6 +99,7 @@ export default function SignIn() {
             Sign in
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            {/* Email and password fields */}
             <TextField
               margin="normal"
               required
@@ -106,18 +124,27 @@ export default function SignIn() {
               onChange={handlePasswordChange}
               autoComplete="current-password"
             />
+            {/* Remember me checkbox */}
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
+            {/* Sign In button */}
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
+            {error && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
+            {/* Forgot password and Sign Up links */}
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
@@ -132,7 +159,6 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );
