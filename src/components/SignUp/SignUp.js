@@ -13,10 +13,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-// import { auth } from '../../firebase';
+import { auth } from '../../firebase';
 
 // Import createUserWithEmailAndPassword from firebase/auth
-//import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 function SignUp() {
   //const [email, setEmail] = useState('');
@@ -36,8 +36,10 @@ function SignUp() {
 
     try {
       // Create user in Firebase
-      //const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
-      //const user = userCredential.user;
+      const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
+      console.log(userCredential);
+      // const user = userCredential.user;
+      // console.log(user);
 
       // If successful, proceed with your existing user registration logic
       const response = await fetch('http://localhost:8001/api/users/register', {

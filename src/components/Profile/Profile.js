@@ -7,7 +7,8 @@ import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';import Typography from '@mui/material/Typography';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { auth } from '../../firebase';
@@ -61,6 +62,45 @@ export default function Profile() {
     });
   };
 
+  const handleDeleteProfile = async () => {
+    const confirmed = window.confirm('Are you sure you want to delete your profile?');
+  
+    if (confirmed) {
+      try {
+        // Perform the deletion from Firebase
+        const currentUser = auth.currentUser;
+        const idToken = await currentUser.getIdToken();
+        await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:delete?key=${process.env.REACT_APP_FIREBASE_API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ idToken }),
+        });
+  
+        // Perform the deletion from the local database
+        console.log(userData.id);
+        const response = await fetch(`http://localhost:8001/api/users/${userData.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // Include any necessary authorization headers (e.g., Firebase JWT)
+          },
+        });
+  
+        if (response.ok) {
+          console.log('Profile deleted successfully from the local database');
+          // Redirect the user to the login page or any other page
+          history.push('/signin');
+        } else {
+          console.error('Failed to delete profile from the local database');
+        }
+      } catch (error) {
+        console.error('Error deleting profile:', error);
+      }
+    }
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -74,7 +114,7 @@ export default function Profile() {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <AccountCircleIcon />
+            <AccountCircleIcon />
           </Avatar>
           {userData ? (
             <>
@@ -131,6 +171,15 @@ export default function Profile() {
                     </Link>
                   </Grid>
                 </Grid>
+              </Box>
+              <Box sx={{ mt: 3 }}>
+                <Button
+                  onClick={handleDeleteProfile}
+                  variant="contained"
+                  color="error" // You might need to customize the color
+                >
+                  Delete My Profile
+                </Button>
               </Box>
             </>
           ) : (
