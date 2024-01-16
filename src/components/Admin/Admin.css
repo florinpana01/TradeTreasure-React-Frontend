@@ -1,0 +1,25 @@
+/* Admin.css */
+
+.admin-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .admin-content {
+    width: 60%; /* Adjust the width as needed */
+  }
+  
+  .admin-form {
+    width: 40%; /* Adjust the width as needed */
+  }
+  
+  .user {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Add more styles as needed */
+  
